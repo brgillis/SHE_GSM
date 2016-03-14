@@ -50,17 +50,17 @@ IMPLEMENT_PARAM(exp_time, dv::image_level, IndFixed(dv::exp_time)
 	,
 		_cached_value = _p_params->get_independently(get_rng());
 	);
-IMPLEMENT_PARAM(cluster_density, dv::image_level, IndFixed(dv::cluster_density)
+IMPLEMENT_PARAM(cluster_density, dv::image_level, Calculated
 	,
-		_cached_value = _p_params->get_independently(get_rng());
+		_cached_value = visible_clusters(1.*square(unitconv::amintorad*rad));
 	,
-		_cached_value = _p_params->get_independently(get_rng());
+		_cached_value = visible_clusters(1.*square(unitconv::amintorad*rad));
 	);
-IMPLEMENT_PARAM(galaxy_density, dv::image_level, IndFixed(dv::galaxy_density)
+IMPLEMENT_PARAM(galaxy_density, dv::image_level, Calculated
 	,
-		_cached_value = _p_params->get_independently(get_rng());
+		_cached_value = visible_galaxies(1.*square(unitconv::amintorad*rad));
 	,
-		_cached_value = _p_params->get_independently(get_rng());
+		_cached_value = visible_galaxies(1.*square(unitconv::amintorad*rad));
 	);
 IMPLEMENT_PARAM(image_area, dv::image_level, Calculated
 	,

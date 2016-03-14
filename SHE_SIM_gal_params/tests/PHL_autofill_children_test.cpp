@@ -31,7 +31,9 @@
 #include <boost/test/unit_test.hpp>
 
 #include "IceBRG_main/math/misc_math.hpp"
+#include "IceBRG_main/units/unit_conversions.hpp"
 #include "IceBRG_physics/cluster_visibility.hpp"
+#include "IceBRG_physics/galaxy_visibility.hpp"
 
 #include <SHE_SIM_gal_params/common.hpp>
 #include "SHE_SIM_gal_params/levels/Cluster.hpp"
@@ -50,13 +52,14 @@ struct PHL_autofill_children_fixture {
 
 	Survey survey1;
 
-	flt_t ex_satellites = IceBRG::mean_cluster_richness(0.2,1.3) - 1;
+	flt_t ex_satellites = mean_cluster_richness(0.2,1.3) - 1;
 	flt_t ex_fields = dv::num_fields;
 	flt_t ex_images = dv::num_images;
 
 	flt_t accepted_sigma = 3.;
 
-	flt_t ex_clusters = dv::image_size_xp * dv::image_size_yp * square(dv::pixel_scale/60.) * dv::cluster_density;
+	flt_t ex_clusters = dv::image_size_xp * dv::image_size_yp * square(dv::pixel_scale/60.) *
+			visible_clusters(1.*square(unitconv::amintorad*rad));
 	flt_t ex_clusters_min = ex_clusters - accepted_sigma * std::sqrt(ex_clusters);
 	flt_t ex_clusters_max = ex_clusters + accepted_sigma * std::sqrt(ex_clusters);
 
@@ -64,7 +67,8 @@ struct PHL_autofill_children_fixture {
 	flt_t ex_cgs_min = ex_cgs - accepted_sigma * std::sqrt(ex_cgs-1); // - 1 to exclude central from variation
 	flt_t ex_cgs_max = ex_cgs + accepted_sigma * std::sqrt(ex_cgs-1); // - 1 to exclude central from variation
 
-	flt_t ex_fgs = dv::image_size_xp * dv::image_size_yp * square(dv::pixel_scale/60.) * dv::galaxy_density -
+	flt_t ex_fgs = dv::image_size_xp * dv::image_size_yp * square(dv::pixel_scale/60.) *
+			visible_galaxies(1.*square(unitconv::amintorad*rad)) -
 			ex_clusters*ex_cgs;
 	flt_t ex_fgs_min = ex_fgs - accepted_sigma * std::sqrt(ex_fgs);
 	flt_t ex_fgs_max = ex_fgs + accepted_sigma * std::sqrt(ex_fgs);

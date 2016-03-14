@@ -25,6 +25,11 @@
 
 #include <utility>
 
+#include "IceBRG_main/math/misc_math.hpp"
+#include "IceBRG_main/units/unit_conversions.hpp"
+#include "IceBRG_physics/cluster_visibility.hpp"
+#include "IceBRG_physics/galaxy_visibility.hpp"
+
 #include "SHE_SIM_gal_params/default_values.hpp"
 #include "SHE_SIM_gal_params/ParamGenerator.hpp"
 #include "SHE_SIM_gal_params/ParamHierarchyLevel.hpp"
@@ -137,6 +142,8 @@ struct param##_initializer \
 param##_initializer param##_initializer_instance;
 
 #define REQUEST(param) _request_param_value(param##_name)
+
+using namespace IceBRG;
 
 #include "src/param_implementation_detail/high_level_param_implementations.hh"
 

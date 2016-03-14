@@ -45,9 +45,6 @@ constexpr const int_t image_group_level = 1;
 
 constexpr const int_t image_level = 2;
 
-constexpr const flt_t cluster_density = 1.398166241099125; // #/arcmin^2
-constexpr const flt_t galaxy_density = 73.98910170237812; // #/arcmin^2
-
 constexpr const flt_t num_fields = 1.; // #/arcsec^2
 
 constexpr const flt_t image_size_xp = 4096; // pixels

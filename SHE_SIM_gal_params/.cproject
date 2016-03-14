@@ -74,8 +74,8 @@
 								<option id="gnu.cpp.link.option.paths.860336375" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/IceBRG_lensing/Debug}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/IceBRG_physics/Debug}&quot;"/>
-									<listOptionValue builtIn="false" value="/home/brg/lib"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/IceBRG_main/Debug}&quot;"/>
+									<listOptionValue builtIn="false" value="/home/brg/lib"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.663912943" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
