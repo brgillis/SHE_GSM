@@ -22,6 +22,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from multiprocessing import cpu_count, Pool
+
 import numpy as np
 
 from shear_calibration import magic_values as mv
@@ -49,12 +51,19 @@ def perform_mock_calibration(n = mv.default_n,
                                             ell_trunc_max, ell_trunc_p, proper_shear_addition,
                                             seed)
     
+    results = {}
+    
     mm, cm, sigma_mm, sigma_cm = get_m_and_c(shears, measured_shapes)
+    
+    results['mm'] = mm
+    results['cm'] = cm
+    results['sigma_mm'] = sigma_mm
+    results['sigma_cm'] = sigma_cm
     
     calibrated_shapes = calibrate_shear(measured_shapes, mm, cm, sigma_mm, sigma_cm)
     
     # Get the known bias components after the correction
-    mmp, cmp, sigma_mmp, sigma_cmp = get_m_and_c(shears, calibrated_shapes)
+    results['mmp'], results['cmp'], _, _ = get_m_and_c(shears, calibrated_shapes)
     
     
     # Now perform the correction on noise-free data to see what the actual bias is after correction
@@ -64,11 +73,83 @@ def perform_mock_calibration(n = mv.default_n,
                                                    sigma_mm, sigma_cm)
     
     # Get the true bias components after the correction
-    mp, cp, _sigma_mp, _sigma_cp = get_m_and_c(noise_free_shears, noise_free_calibrated_shears)
+    results['mp'], results['cp'], _, _ = get_m_and_c(noise_free_shears, noise_free_calibrated_shears)
     
+    return results
+
+class perform_mock_calibration_caller(object):
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+    def __call__(self, seed):
+        return perform_mock_calibration(*self.args,seed=seed,**self.kwargs)
     
-    return ( mm, cm,
-             sigma_mm, sigma_cm,
-             mmp, cmp,
-             mp, cp )
+def perform_multiple_mock_calibrations(ncal = mv.default_ncal,
+                                       n = mv.default_n,
+                             
+                                       m = 0.1,
+                                       c = -0.3,
+                                         
+                                       shear_sigma = mv.default_shear_sigma,
+                                       shape_sigma = mv.default_shape_sigma,
+                               
+                                       ell_trunc_max = mv.ell_trunc_max,
+                                       ell_trunc_p = mv.ell_trunc_p,
+                                           
+                                       proper_shear_addition = False,
+                                         
+                                       seed = mv.default_seed,
+                                       nproc=-1):
     
+    result_arrays = {}
+
+    if seed == 0:
+        seeds = np.zeros(ncal, dtype=int)
+    else:
+        seeds = np.asarray(np.linspace(0, ncal-1, ncal),dtype=int)
+
+    # If we just have one thread, we'll just use a simply function call to ease debugging
+    if nproc == 1:
+        all_calibration_results = []
+        for local_seed in seeds:
+            all_calibration_results.append( perform_mock_calibration(n, m, c,
+                                                                     shear_sigma,
+                                                                     shape_sigma,
+                                                                     ell_trunc_max,
+                                                                     ell_trunc_p,
+                                                                     proper_shear_addition,
+                                                                     seed=local_seed) )
+    else:
+        if(nproc <= 0):
+            nproc += cpu_count()
+            
+        pool = Pool(processes=nproc,maxtasksperchild=10)
+        all_calibration_results = pool.map(perform_mock_calibration_caller(n, m, c,
+                                                                         shear_sigma,
+                                                                         shape_sigma,
+                                                                         ell_trunc_max,
+                                                                         ell_trunc_p,
+                                                                         proper_shear_addition),
+                                           seeds,chunksize=10)
+        
+    for calibration_results in all_calibration_results:
+        # Append results to the result arrays
+        for key in calibration_results:
+            if key not in result_arrays:
+                result_arrays[key] = []
+            result_arrays[key].append(calibration_results[key])
+            
+    # Get the results for this
+    results = {}
+    
+    for key in result_arrays:
+        
+        # Add the whole array to the results
+        results[key] = np.array(result_arrays[key])
+        
+        # Add the mean and sigma to the results
+        results[key+"_mean"] = np.mean(results[key])
+        results[key+"_sigma"] = np.std(results[key])
+        results[key+"_stderr"] = results[key+"_sigma"] / np.sqrt(np.shape(results[key])[0]-1)
+        
+    return results

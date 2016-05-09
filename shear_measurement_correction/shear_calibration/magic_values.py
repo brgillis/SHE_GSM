@@ -22,7 +22,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-default_n = 1e6
+default_ncal = int(1e4)
+default_n = int(1e4)
 
 default_seed = 0
 

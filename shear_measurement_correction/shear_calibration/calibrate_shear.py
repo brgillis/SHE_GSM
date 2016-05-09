@@ -23,12 +23,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-def calibrate_shear(g, m=0., c=0., sigma_m=0., sigma_c=0.):
+def calibrate_shear(g, m=0., c=0., sigma_m=0., sigma_c=0.,
+                    second_order = True):
     
     gp = ( g - c ) * ( 1. - m + m**2 ) # First order correction
-    gpp = gp * ( 1. - sigma_m**2*(1+m) - m**3 ) # Second-order correction
-    
-    return gpp
+    if not second_order:
+        return gp
+    else:
+        gpp = gp * ( 1. - sigma_m**2*(1+m) - m**3 ) # Second-order correction
+        return gpp
 
 def get_error_of_calibrated_shear(sigma_g, m=0., c=0., sigma_m=0., sigma_c=0.):
     
