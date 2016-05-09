@@ -24,7 +24,7 @@
 
 default_n = 1e6
 
-default_seed = 1390512
+default_seed = 0
 
 # Sigma for the shear and intrinsic ellipticity ("shape") distributions
 default_shear_sigma = 0.03

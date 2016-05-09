@@ -49,10 +49,15 @@ def make_test_set( n = mv.default_n,
                    ell_trunc_max = mv.ell_trunc_max,
                    ell_trunc_p = mv.ell_trunc_p,
                    
-                   proper_shear_addition = False ):
+                   proper_shear_addition = False,
+                   
+                   seed = mv.default_seed ):
     """
         @TODO: Function docstring
     """
+    
+    if seed != 0:
+        np.random.seed(seed)
     
     intrinsic_shapes = contracted_Gaus_rand(shape_sigma, ell_trunc_max, ell_trunc_p, n)
     shears = contracted_Gaus_rand(shear_sigma, ell_trunc_max, ell_trunc_p, n)

@@ -46,14 +46,15 @@ def perform_mock_calibration(n = mv.default_n,
     
     # Start by a standard measurement and calibration of a mock test set with the given parameters
     shears, measured_shapes = make_test_set(n, shear_sigma, shape_sigma, m, c,
-                                            ell_trunc_max, ell_trunc_p, proper_shear_addition)
+                                            ell_trunc_max, ell_trunc_p, proper_shear_addition,
+                                            seed)
     
     mm, cm, sigma_mm, sigma_cm = get_m_and_c(shears, measured_shapes)
     
     calibrated_shapes = calibrate_shear(measured_shapes, mm, cm, sigma_mm, sigma_cm)
     
     # Get the known bias components after the correction
-    mmp, cmp, sigma_mmp, sigma_cmp = get_m_and_c(shears, measured_shapes)
+    mmp, cmp, sigma_mmp, sigma_cmp = get_m_and_c(shears, calibrated_shapes)
     
     
     # Now perform the correction on noise-free data to see what the actual bias is after correction
@@ -68,5 +69,6 @@ def perform_mock_calibration(n = mv.default_n,
     
     return ( mm, cm,
              sigma_mm, sigma_cm,
+             mmp, cmp,
              mp, cp )
     
