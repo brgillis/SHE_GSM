@@ -1,13 +1,13 @@
-""" @file calibrate_shear.py
+""" @file regress_test_set.py
 
-    Created 13 Aug 2015
+    Created 9 May 2016
 
-    Functions to calibrate a single shear value and get the error on the
-    calibrated value.
+    Functions to perform a linear regression on test data to get m, c,
+    and their errors.
 
     ---------------------------------------------------------------------
 
-    Copyright (C) 2015 Bryan R. Gillis
+    Copyright (C) 2016 Bryan R. Gillis
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,13 +23,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-def calibrate_shear(g, m=0., c=0., sigma_m=0., sigma_c=0.):
-    
-    gp = ( g - c ) * ( 1. - m + m**2 ) # First order correction
-    gpp = gp * ( 1. - sigma_m**2*(1+m) - m**3 ) # Second-order correction
-    
-    return gpp
+import numpy as np
+from scipy.stats import linregress
 
-def get_error_of_calibrated_shear(sigma_g, m=0., c=0., sigma_m=0., sigma_c=0.):
+def get_m_and_c(shears, measured_shapes):
     
-    return sigma_g*(1. + m + 1.5*m**2 + 1.5*sigma_m**2)
+    n = np.shape(shears)[0]
+    
+    regression = linregress(shears, measured_shapes)
+
+    m = regression[0]-1
+    c = regression[1]
+
+    m_err = regression[4]
+    c_err = regression[4]*np.sqrt((np.sum(np.square(shears))) / n)
+    
+    return m, c, m_err, c_err

@@ -3,6 +3,7 @@
 	<name>shear_measurement_correction</name>
 	<comment></comment>
 	<projects>
+		<project>cIceBRGpy</project>
 		<project>SBE_Example_Code</project>
 	</projects>
 	<buildSpec>

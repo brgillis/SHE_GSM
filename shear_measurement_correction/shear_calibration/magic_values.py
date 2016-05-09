@@ -1,13 +1,12 @@
-""" @file calibrate_shear.py
+""" @file magic_values.py
 
-    Created 13 Aug 2015
+    Created 9 May 2016
 
-    Functions to calibrate a single shear value and get the error on the
-    calibrated value.
+    Magic values for the shear_measurement_correction project
 
     ---------------------------------------------------------------------
 
-    Copyright (C) 2015 Bryan R. Gillis
+    Copyright (C) 2016 Bryan R. Gillis
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,13 +22,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-def calibrate_shear(g, m=0., c=0., sigma_m=0., sigma_c=0.):
-    
-    gp = ( g - c ) * ( 1. - m + m**2 ) # First order correction
-    gpp = gp * ( 1. - sigma_m**2*(1+m) - m**3 ) # Second-order correction
-    
-    return gpp
+default_n = 1e6
 
-def get_error_of_calibrated_shear(sigma_g, m=0., c=0., sigma_m=0., sigma_c=0.):
-    
-    return sigma_g*(1. + m + 1.5*m**2 + 1.5*sigma_m**2)
+default_seed = 1390512
+
+# Sigma for the shear and intrinsic ellipticity ("shape") distributions
+default_shear_sigma = 0.03
+default_shape_sigma = 0.25
+
+# Parameters to handle truncation of ellipticity measurements
+ell_trunc_max = 0.9
+ell_trunc_p = 4
+
