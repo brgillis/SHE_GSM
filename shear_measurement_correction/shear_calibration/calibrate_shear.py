@@ -33,6 +33,14 @@ def calibrate_shear(g, m=0., c=0., sigma_m=0., sigma_c=0.,
         gpp = gp * ( 1. - sigma_m**2*(1+m) - m**3 ) # Second-order correction
         return gpp
 
-def get_error_of_calibrated_shear(sigma_g, m=0., c=0., sigma_m=0., sigma_c=0.):
+def get_m_error_of_calibrated_shear(m, sigma_m):
     
-    return sigma_g*(1. + m + 1.5*m**2 + 1.5*sigma_m**2)
+    return sigma_m*(1. - m - 2*m**2 + sigma_m**2)
+
+def get_c_error_of_calibrated_shear(m, sigma_m, sigma_c):
+    
+    return sigma_c*(1. - m + m**2 + 1.5*sigma_m**2)
+
+def get_g_error_of_calibrated_shear(m, sigma_m, sigma_g):
+    
+    return sigma_g*(1. - m + m**2 + 1.5*sigma_m**2)
