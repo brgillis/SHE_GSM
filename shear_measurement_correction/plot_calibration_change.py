@@ -38,17 +38,23 @@ markersize = 8
 fontsize = 24
 file_format = "eps"
 paper_location = "/home/brg/Dropbox/gillis-comp-shared/Papers/Shear_Bias/"
-calibration_set_size = "1e6"
-calibration_order = "1st"
 
 def main(argv):
     """ @TODO main docstring
     """
     
+    calibration_set_size = "1e6"
+    calibration_order = "1st"
+    
     if len(argv) > 1:
         calibration_set_size = argv[1]
     if len(argv) > 2:
         calibration_order = argv[2]
+        
+    if calibration_set_size == "1e6":
+        size_label = r"$N = 10^6$"
+    else:
+        size_label = r"$N = 10^4$"
     
     results_dir = "calibration_results_" + calibration_set_size + "_" + calibration_order
     
@@ -89,6 +95,10 @@ def main(argv):
         
         ax.set_yscale("symlog",linthreshy=0.01)
         ax.set_xscale("symlog",linthreshx=0.0001)
+    
+        ax.text(0.06,0.97,size_label,horizontalalignment='left',
+                verticalalignment='top',transform=ax.transAxes,
+                fontsize=24)
         
         # Draw axes
         ax.plot([-1,1],[0,0],label=None,color="k",linestyle="solid",linewidth=0.5)
@@ -106,8 +116,21 @@ def main(argv):
             for c in test_cs:
                 b_color = (c+0.1)/0.2
                 
-                # Skip the central point
-                if m==0 and c==0:
+                # Only label the central point, and give it the color black instead,
+                # but hide it (it'll still show up in the legend)
+                if m==0 and c==0:                
+                    ax.errorbar([-1e99],[-1e99], marker='.',markersize=markersize,
+                                label="No correction",
+                                linestyle="None",linewidth=2,color='k',
+                                xerr=[1], yerr=[1])
+                    eb1 = ax.errorbar([-1e99],[-1e99], marker='o',markersize=markersize,
+                                label=calibration_order+"-order correction",
+                                linestyle="None",linewidth=2,
+                                markerfacecolor='None',markeredgecolor='k',color='k',
+                                xerr=[1], yerr=[1])
+                
+                    eb1[-1][0].set_linestyle('dotted')
+                    eb1[-1][-1].set_linestyle('dotted')
                     continue
                 
                 color = (r_color,1-(r_color+b_color)/2,b_color)
@@ -115,20 +138,23 @@ def main(argv):
                 res = results[(c,m)]
                 
                 ax.errorbar([res["c"+m_tag+"_mean"]],[res["m"+m_tag+"_mean"]],
-                            marker='.',markersize=markersize,label=str((c,m)),
+                            marker='.',markersize=markersize,label=None,
                             linestyle="None",linewidth=2,color=color,
                             xerr=[res["c"+m_tag+"_sigma"]],
                             yerr=[res["m"+m_tag+"_sigma"]])
                 
                 eb1 = ax.errorbar([res["c"+m_tag+"p_mean"]],[res["m"+m_tag+"p_mean"]],
                             marker='o',markerfacecolor='None',markeredgecolor=color,
-                            markersize=markersize,label=str((c,m))+"'",
+                            markersize=markersize,label=None,
                             linestyle="None",linewidth=2,color=color,
                             xerr=[res["c"+m_tag+"p_sigma"]],
                             yerr=[res["m"+m_tag+"p_sigma"]])
                 
                 eb1[-1][0].set_linestyle('dotted')
                 eb1[-1][-1].set_linestyle('dotted')
+        
+        ax.legend(loc='lower right',bbox_to_anchor=(0.95, 0.1),
+                  bbox_transform=ax.transAxes,numpoints=1)
     
         # Save the plot
         figname = (measured_label.lower() + "_" + calibration_set_size + "_"
