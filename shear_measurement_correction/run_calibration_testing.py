@@ -36,8 +36,8 @@ def main(argv):
     test_ms = [-0.1, 0., 0.1]
     test_cs = [-0.1, 0., 0.1]
     
-    ncal = int(1e4)
-    n = int(1e6)
+    ncal = int(1e5)
+    n = int(1e4)
     
     for m in test_ms:
         for c in test_cs:
@@ -45,7 +45,7 @@ def main(argv):
             print("Testing for m="+str(m)+", c="+str(c)+"...")
             
             results = perform_multiple_mock_calibrations(ncal=ncal, n=n, m=m, c=c, seed=1, nproc=-1,
-                                                         second_order=True)
+                                                         second_order=False)
             
             filename = "calibration_results_m_" + str(m) + "_c_" + str(c) + ".bin"
             

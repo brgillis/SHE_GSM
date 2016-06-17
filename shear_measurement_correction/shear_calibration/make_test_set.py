@@ -61,13 +61,11 @@ def make_test_set( n = mv.default_n,
     
     intrinsic_shapes = contracted_Gaus_rand(shape_sigma, ell_trunc_max, ell_trunc_p, n)
     shears = contracted_Gaus_rand(shear_sigma, ell_trunc_max, ell_trunc_p, n)
+    measured_shears = (1+m)*shears + c
     
     if proper_shear_addition:
-        shapes = add_ell_1d(intrinsic_shapes, shears)
+        shapes = add_ell_1d(intrinsic_shapes, measured_shears)
     else:
-        shapes = intrinsic_shapes + shears
-        
-    # Apply mock bias
-    measured_shapes = (1+m)*shapes + c
+        shapes = intrinsic_shapes + measured_shears
     
-    return shears, measured_shapes
+    return shears, shapes

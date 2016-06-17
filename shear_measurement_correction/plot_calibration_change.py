@@ -27,14 +27,19 @@
 import sys
 import cPickle
 from os.path import join
+import numpy as np
 
 import matplotlib
 import matplotlib.pyplot as pyplot
 matplotlib.rcParams['ps.useafm'] = True
 matplotlib.rcParams['pdf.use14corefonts'] = True
 matplotlib.rcParams['text.usetex'] = True
+
+sigma_gm = 0.25
+sigma_gs = 0.03
     
 markersize = 8
+pred_markersize = 64
 fontsize = 24
 file_format = "eps"
 paper_location = "/home/brg/Dropbox/gillis-comp-shared/Papers/Shear_Bias/"
@@ -43,7 +48,7 @@ def main(argv):
     """ @TODO main docstring
     """
     
-    calibration_set_size = "1e6"
+    calibration_set_size = "1e4"
     calibration_order = "1st"
     
     if len(argv) > 1:
@@ -131,6 +136,11 @@ def main(argv):
                 
                     eb1[-1][0].set_linestyle('dotted')
                     eb1[-1][-1].set_linestyle('dotted')
+                    
+                    if (calibration_order=="1st") and (measured_label=="Actual"):
+                        ax.scatter([-1e99],[-1e99],marker='x',s=pred_markersize,color='k',
+                                   label="Predicted residual bias")
+                    
                     continue
                 
                 color = (r_color,1-(r_color+b_color)/2,b_color)
@@ -152,9 +162,22 @@ def main(argv):
                 
                 eb1[-1][0].set_linestyle('dotted')
                 eb1[-1][-1].set_linestyle('dotted')
+                
+                # If first-order, plotted expected biases as well
+                if (calibration_order=="1st") and (measured_label=="Actual"):
+                    
+                    m = res["m_mean"]
+                    
+                    sigma_mm = 1/np.sqrt(float(calibration_set_size)) * ( sigma_gm/sigma_gs )
+                    
+                    c_prediction = 0
+                    m_prediction = sigma_mm**2*(1+m) + m**3
+                    
+                    ax.scatter([c_prediction],[m_prediction],
+                               marker='x',s=pred_markersize,color=color,label=None)
         
         ax.legend(loc='lower right',bbox_to_anchor=(0.95, 0.1),
-                  bbox_transform=ax.transAxes,numpoints=1)
+                  bbox_transform=ax.transAxes,numpoints=1,scatterpoints=1)
     
         # Save the plot
         figname = (measured_label.lower() + "_" + calibration_set_size + "_"
