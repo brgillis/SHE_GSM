@@ -40,7 +40,7 @@ from shear_calibration import magic_values as mv
 sigma_gm = mv.default_shape_sigma
 sigma_gs = mv.default_shear_sigma
     
-markersize = 100
+markersize = 400
 fontsize = 24
 file_format = "eps"
 paper_location = "/home/brg/Dropbox/gillis-comp-shared/Papers/Shear_Bias/"
