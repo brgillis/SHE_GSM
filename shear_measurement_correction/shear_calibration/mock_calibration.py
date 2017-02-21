@@ -29,7 +29,10 @@ import numpy as np
 from shear_calibration import magic_values as mv
 from shear_calibration.make_test_set import make_test_set
 from shear_calibration.regress_test_set import get_m_and_c
-from shear_calibration.calibrate_shear import calibrate_shear
+from shear_calibration.calibrate_shear import calibrate_shear, calibrate_shear_bayesian,\
+    get_bayesian_m_error_of_calibrated_shear,\
+    get_bayesian_c_error_of_calibrated_shear,\
+    get_bayesian_g_error_of_calibrated_shear
 
 def perform_mock_calibration(n = mv.default_n,
                              
@@ -45,13 +48,14 @@ def perform_mock_calibration(n = mv.default_n,
                              proper_shear_addition = False,
                              
                              second_order = True,
+                             bayesian = False,
                              
                              seed = mv.default_seed):
     
     # Start by a standard measurement and calibration of a mock test set with the given parameters
     shears, measured_shapes = make_test_set(n, shear_sigma, shape_sigma, m, c,
                                             ell_trunc_max, ell_trunc_p, proper_shear_addition,
-                                            seed)
+                                            seed=seed)
     
     results = {}
     
@@ -62,8 +66,14 @@ def perform_mock_calibration(n = mv.default_n,
     results['sigma_mm'] = sigma_mm
     results['sigma_cm'] = sigma_cm
     
-    calibrated_shapes = calibrate_shear(measured_shapes, mm, cm, sigma_mm, sigma_cm,
-                                        second_order=second_order)
+    if bayesian:
+        calibrated_shapes = calibrate_shear_bayesian(measured_shapes, mm, cm, shape_sigma, sigma_mm, sigma_cm)
+        results['pred_sigma_mm'] = get_bayesian_m_error_of_calibrated_shear(mm,sigma_mm)
+        results['pred_sigma_cm'] = get_bayesian_c_error_of_calibrated_shear(mm,sigma_mm,sigma_cm)
+        results['pred_sigma_gm'] = get_bayesian_g_error_of_calibrated_shear(mm,sigma_mm,shape_sigma)
+    else:
+        calibrated_shapes = calibrate_shear(measured_shapes, mm, cm, sigma_mm, sigma_cm,
+                                            second_order=second_order)
     
     # Get the known bias components after the correction
     results['mmp'], results['cmp'], _, _ = get_m_and_c(shears, calibrated_shapes)
@@ -107,6 +117,7 @@ def perform_multiple_mock_calibrations(ncal = mv.default_ncal,
                                        proper_shear_addition = False,
                                        
                                        second_order = True,
+                                       bayesian = False,
                                          
                                        seed = mv.default_seed,
                                        nproc=-1):
@@ -123,14 +134,14 @@ def perform_multiple_mock_calibrations(ncal = mv.default_ncal,
 
     for i in range(nchunks):
         
-        size = min(chunksize,ncal-c*chunksize)
+        size = min(chunksize,ncal-i*chunksize)
 
         if seed == 0:
             seeds = np.zeros(size, dtype=int)
         else:
-            seeds = np.asarray(np.linspace(i*chunksize, i*chunksize + size - 1, size),dtype=int)
+            seeds = np.asarray(seed*ncal+np.linspace(i*chunksize, i*chunksize + size - 1, size),dtype=int)
         
-        # If we just have one thread, we'll just use a simply function call to ease debugging
+        # If we just have one thread, we'll just use a simple function call to ease debugging
         if nproc == 1:
             all_calibration_results = []
             for local_seed in seeds:
@@ -141,6 +152,7 @@ def perform_multiple_mock_calibrations(ncal = mv.default_ncal,
                                                                          ell_trunc_p,
                                                                          proper_shear_addition,
                                                                          second_order=second_order,
+                                                                         bayesian=bayesian,
                                                                          seed=local_seed) )
         else:
                 
@@ -151,7 +163,8 @@ def perform_multiple_mock_calibrations(ncal = mv.default_ncal,
                                                                              ell_trunc_max,
                                                                              ell_trunc_p,
                                                                              proper_shear_addition,
-                                                                             second_order=second_order),
+                                                                             second_order=second_order,
+                                                                             bayesian=bayesian),
                                                seeds,chunksize=10)
             
             pool.terminate()

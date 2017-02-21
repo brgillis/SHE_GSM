@@ -35,12 +35,15 @@ matplotlib.rcParams['ps.useafm'] = True
 matplotlib.rcParams['pdf.use14corefonts'] = True
 matplotlib.rcParams['text.usetex'] = True
 
-sigma_gm = 0.25
-sigma_gs = 0.03
+from shear_calibration import magic_values as mv
+
+sigma_gm = mv.default_shape_sigma
+sigma_gs = mv.default_shear_sigma
     
 markersize = 8
 pred_markersize = 64
 fontsize = 24
+ticksize = 16
 file_format = "eps"
 paper_location = "/home/brg/Dropbox/gillis-comp-shared/Papers/Shear_Bias/"
 
@@ -48,149 +51,168 @@ def main(argv):
     """ @TODO main docstring
     """
     
-    calibration_set_size = "1e4"
-    calibration_order = "1st"
+    for calibration_set_size in ("1e4","1e6"):
+        for calibration_order in ("1st","2nd"):
     
-    if len(argv) > 1:
-        calibration_set_size = argv[1]
-    if len(argv) > 2:
-        calibration_order = argv[2]
-        
-    if calibration_set_size == "1e6":
-        size_label = r"$N = 10^6$"
-    else:
-        size_label = r"$N = 10^4$"
-    
-    results_dir = "calibration_results_" + calibration_set_size + "_" + calibration_order
-    
-    # Load in the calculated results
-    test_ms = [-0.1, 0., 0.1]
-    test_cs = [-0.1, 0., 0.1]
-    
-    results = {}
-    
-    for m in test_ms:
-        for c in test_cs:
+            if len(argv) > 1:
+                calibration_set_size = argv[1]
+            if len(argv) > 2:
+                calibration_order = argv[2]
+                
+            if calibration_set_size == "1e6":
+                size_label = r"$n = 10^6$"
+                cal_scale = 0.1
+            else:
+                size_label = r"$n = 10^4$"
+                cal_scale = 1.
             
-            filename = join(results_dir,"calibration_results_m_" + str(m) + "_c_" + str(c) + ".bin")
+            results_dir = "calibration_results_" + calibration_set_size + "_" + calibration_order
             
-            with open(filename,'rb') as fi:
-                new_res = cPickle.load(fi)
-                new_res["c_mean"] = c
-                new_res["m_mean"] = m
-                new_res["c_sigma"] = 0
-                new_res["m_sigma"] = 0
-                results[(c,m)] = new_res
-                
-    # We'll plot both the change in measured values and actual values
-    for m_tag, measured_label in (("m", "Measured"),
-                                  ("", "Actual")):
-        
-        # Setup the figure
-        
-        fig = pyplot.figure()
-        fig.subplots_adjust(wspace=0, hspace=0, bottom=0.1, right=0.95, top=0.95, left=0.12)
-        
-        ax = fig.add_subplot(1,1,1)
-        ax.set_xlabel(measured_label + " c",fontsize=fontsize)
-        ax.set_ylabel(measured_label + " m",fontsize=fontsize)
-        
-        ax.set_xlim(-0.25,0.25)
-        ax.set_ylim(-0.31,0.31)
-        
-        ax.set_yscale("symlog",linthreshy=0.01)
-        ax.set_xscale("symlog",linthreshx=0.0001)
-    
-        ax.text(0.06,0.97,size_label,horizontalalignment='left',
-                verticalalignment='top',transform=ax.transAxes,
-                fontsize=24)
-        
-        # Draw axes
-        ax.plot([-1,1],[0,0],label=None,color="k",linestyle="solid",linewidth=0.5)
-        ax.plot([0,0],[-1,1],label=None,color="k",linestyle="solid",linewidth=0.5)
-        
-        ax.plot([-1,1],[0.1,0.1],label=None,color="k",linestyle="dotted",linewidth=0.5)
-        ax.plot([-1,1],[-0.1,-0.1],label=None,color="k",linestyle="dotted",linewidth=0.5)
-        ax.plot([0.1,0.1],[-1,1],label=None,color="k",linestyle="dotted",linewidth=0.5)
-        ax.plot([-0.1,-0.1],[-1,1],label=None,color="k",linestyle="dotted",linewidth=0.5)
-    
-        # Plot the points
-        
-        for m in test_ms:
-            r_color = (m+0.1)/0.2
-            for c in test_cs:
-                b_color = (c+0.1)/0.2
-                
-                # Only label the central point, and give it the color black instead,
-                # but hide it (it'll still show up in the legend)
-                if m==0 and c==0:                
-                    ax.errorbar([-1e99],[-1e99], marker='.',markersize=markersize,
-                                label="No correction",
-                                linestyle="None",linewidth=2,color='k',
-                                xerr=[1], yerr=[1])
-                    eb1 = ax.errorbar([-1e99],[-1e99], marker='o',markersize=markersize,
-                                label=calibration_order+"-order correction",
-                                linestyle="None",linewidth=2,
-                                markerfacecolor='None',markeredgecolor='k',color='k',
-                                xerr=[1], yerr=[1])
-                
-                    eb1[-1][0].set_linestyle('dotted')
-                    eb1[-1][-1].set_linestyle('dotted')
+            # Load in the calculated results
+            test_ms = [-0.1, 0., 0.1]
+            test_cs = [-0.1, 0., 0.1]
+            
+            
+            
+            results = {}
+            
+            for m in test_ms:
+                for c in test_cs:
                     
-                    if (calibration_order=="1st") and (measured_label=="Actual"):
-                        ax.scatter([-1e99],[-1e99],marker='x',s=pred_markersize,color='k',
-                                   label="Predicted residual bias")
+                    filename = join(results_dir,"calibration_results_m_" + str(m) + "_c_" + str(c) + ".bin")
                     
-                    continue
+                    with open(filename,'rb') as fi:
+                        new_res = cPickle.load(fi)
+                        new_res["c_mean"] = c
+                        new_res["m_mean"] = m
+                        new_res["c_sigma"] = 0
+                        new_res["m_sigma"] = 0
+                        results[(c,m)] = new_res
+                        
+            # We'll plot both the change in measured values and actual values
+            for m_tag, measured_label in (("m", "Measured"),
+                                          ("", "Actual")):
                 
-                color = (r_color,1-(r_color+b_color)/2,b_color)
+                # Setup the figure
                 
-                res = results[(c,m)]
+                fig = pyplot.figure()
+                fig.subplots_adjust(wspace=0, hspace=0, bottom=0.1, right=0.95, top=0.95, left=0.12)
                 
-                ax.errorbar([res["c"+m_tag+"_mean"]],[res["m"+m_tag+"_mean"]],
-                            marker='.',markersize=markersize,label=None,
-                            linestyle="None",linewidth=2,color=color,
-                            xerr=[res["c"+m_tag+"_sigma"]],
-                            yerr=[res["m"+m_tag+"_sigma"]])
+                ax = fig.add_subplot(1,1,1)
+                ax.set_xlabel(measured_label + r" $c$",fontsize=fontsize)
+                ax.set_ylabel(measured_label + r" $m$",fontsize=fontsize)
                 
-                eb1 = ax.errorbar([res["c"+m_tag+"p_mean"]],[res["m"+m_tag+"p_mean"]],
-                            marker='o',markerfacecolor='None',markeredgecolor=color,
-                            markersize=markersize,label=None,
-                            linestyle="None",linewidth=2,color=color,
-                            xerr=[res["c"+m_tag+"p_sigma"]],
-                            yerr=[res["m"+m_tag+"p_sigma"]])
+                actual_xlim = 0.005*cal_scale
+                actual_ylim = 0.105*cal_scale
                 
-                eb1[-1][0].set_linestyle('dotted')
-                eb1[-1][-1].set_linestyle('dotted')
-                
-                # If first-order, plotted expected biases as well
-                if (calibration_order=="1st") and (measured_label=="Actual"):
-                    
-                    m = res["m_mean"]
-                    
-                    sigma_mm = 1/np.sqrt(float(calibration_set_size)) * ( sigma_gm/sigma_gs )
-                    
-                    c_prediction = 0
-                    m_prediction = sigma_mm**2*(1+m) + m**3
-                    
-                    ax.scatter([c_prediction],[m_prediction],
-                               marker='x',s=pred_markersize,color=color,label=None)
+                if measured_label=="Measured":
+                    ax.set_xlim(-0.11,0.11)
+                    ax.set_ylim(-0.21,0.21)
+                    xticks = [-0.1,-0.05,0,0.05,0.1]
+                    yticks = [-0.2,-0.1,0,0.1,0.2]
+                else:
+                    ax.set_xlim(-actual_xlim,actual_xlim)
+                    ax.set_ylim(-actual_ylim,actual_ylim)
+                    xticks = [-0.004*cal_scale,-0.002*cal_scale,0,0.002*cal_scale,0.004*cal_scale]
+                    yticks = [-0.1*cal_scale,-0.05*cal_scale,0,0.05*cal_scale,0.1*cal_scale]
         
-        ax.legend(loc='lower right',bbox_to_anchor=(0.95, 0.1),
-                  bbox_transform=ax.transAxes,numpoints=1,scatterpoints=1)
-    
-        # Save the plot
-        figname = (measured_label.lower() + "_" + calibration_set_size + "_"
-                   + calibration_order + "_calibration." + file_format)
-        if file_format == "eps":
-            # Save in the paper location
-            figname = join(paper_location,figname)
-        pyplot.savefig(figname, format=file_format, bbox_inches="tight", pad_inches=0.05)
-        
-        fig.show()
+                ax.set_xticks(xticks)
+                ax.set_xticklabels(xticks,fontsize=ticksize)
+                
+                ax.set_yticks(yticks)
+                ax.set_yticklabels(yticks,fontsize=ticksize)
+            
+                ax.text(0.06,0.97,size_label,horizontalalignment='left',
+                        verticalalignment='top',transform=ax.transAxes,
+                        fontsize=24)
+                
+                # Draw axes
+                ax.plot([-1,1],[0,0],label=None,color=(0.5,0.5,0.5),linestyle="solid",linewidth=0.5)
+                ax.plot([0,0],[-1,1],label=None,color=(0.5,0.5,0.5),linestyle="solid",linewidth=0.5)
+                
+                # If Measured, draw the box for where the Actual plots will be
+                ax.plot([actual_xlim,actual_xlim,-actual_xlim,-actual_xlim,actual_xlim],
+                        [actual_ylim,-actual_ylim,-actual_ylim,actual_ylim,actual_ylim],
+                        color="k",linestyle="dashed",linewidth=1)
+            
+                # Plot the points
+                
+                for m in test_ms:
+                    r_color = (m+0.1)/0.2
+                    for c in test_cs:
+                        b_color = (c+0.1)/0.2
+                        
+                        # Create a dummy label for the center point, colored black
+                        if m==0 and c==0:
+                            if measured_label=="Actual":
+                                ax.errorbar([-10],[-10], marker='o',markersize=markersize,
+                                            label=calibration_order+r"-order correction",
+                                            linestyle="None",linewidth=2,
+                                            markerfacecolor='None',markeredgecolor='k',color='k',
+                                            xerr=[1], yerr=[1])
+                            else:
+                                ax.errorbar([-10],[-10], marker='.',markersize=markersize,
+                                            label=r"No correction",
+                                            linestyle="None",linewidth=2,color='k',
+                                            xerr=[1], yerr=[1])
+                             
+                            if (calibration_order=="1st") and (measured_label=="Actual"):
+                                ax.errorbar([-10],[-10],marker='x',markersize=markersize,color='k',
+                                            label=r"Predicted residual bias",
+                                            linestyle="None",linewidth=2,
+                                            xerr=[1], yerr=[1])
+                        
+                        color = (r_color,1-(r_color+b_color)/2,b_color)
+                        
+                        res = results[(c,m)]
+                        
+                        if measured_label=="Measured":
+                            ax.errorbar([res["c"+m_tag+"_mean"]],[res["m"+m_tag+"_mean"]],
+                                        marker='.',markersize=markersize,label=None,
+                                        linestyle="None",linewidth=2,color=color,
+                                        xerr=[res["c"+m_tag+"_sigma"]],
+                                        yerr=[res["m"+m_tag+"_sigma"]])
+                        else:
+                        
+                            if calibration_order=="2nd":
+                                m2 = "s"
+                            else:
+                                m2 = 'o'
+                             
+                            ax.errorbar([res["c"+m_tag+"p_mean"]],[res["m"+m_tag+"p_mean"]],
+                                        marker=m2,markerfacecolor='None',markeredgecolor=color,
+                                        markersize=markersize,label=None,
+                                        linestyle="None",linewidth=2,color=color,
+                                        xerr=[res["c"+m_tag+"p_sigma"]],
+                                        yerr=[res["m"+m_tag+"p_sigma"]])
+                        
+                        # If first-order, plotted expected biases as well
+                        if (calibration_order=="1st") and (measured_label=="Actual"):
+                            
+                            m = res["m_mean"]
+                            
+                            sigma_mm = 1/np.sqrt(float(calibration_set_size)) * ( sigma_gm/sigma_gs )
+                            
+                            c_prediction = 0
+                            m_prediction = sigma_mm**2*(1+m) + m**3
+                            
+                            ax.scatter([c_prediction],[m_prediction],
+                                       marker='x',s=pred_markersize,color=color,label=None)
+                
+                ax.legend(loc='lower right',fontsize=ticksize,
+                          bbox_transform=ax.transAxes,numpoints=1,scatterpoints=1)
+            
+                # Save the plot
+                figname = (measured_label.lower() + "_" + calibration_set_size + "_"
+                           + calibration_order + "_calibration." + file_format)
+                if file_format == "eps":
+                    # Save in the paper location
+                    figname = join(paper_location,figname)
+                pyplot.savefig(figname, format=file_format, bbox_inches="tight", pad_inches=0.05)
+                
+                fig.show()
         
     pyplot.show()
-    
     return
 
 if __name__ == "__main__":

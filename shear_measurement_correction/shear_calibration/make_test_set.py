@@ -32,9 +32,15 @@ def add_ell_1d(g1,g2):
 def contract_rand(x, max=1.,p=4.):
     return (x / (1. + (np.abs(x) / max)**p)**(1./p));
 
-def contracted_Gaus_rand(sigma=1.,max=1.,p=4.,n=1):
+def Gaus_rand(sigma=1.,n=1):
     
     x = np.random.randn(n)*sigma
+    
+    return x
+
+def contracted_Gaus_rand(sigma=1.,max=1.,p=4.,n=1):
+    
+    x = Gaus_rand(sigma,n)
     
     return contract_rand(x, max, p)
 
@@ -50,6 +56,7 @@ def make_test_set( n = mv.default_n,
                    ell_trunc_p = mv.ell_trunc_p,
                    
                    proper_shear_addition = False,
+                   contract = False,
                    
                    seed = mv.default_seed ):
     """
@@ -59,13 +66,17 @@ def make_test_set( n = mv.default_n,
     if seed != 0:
         np.random.seed(seed)
     
-    intrinsic_shapes = contracted_Gaus_rand(shape_sigma, ell_trunc_max, ell_trunc_p, n)
-    shears = contracted_Gaus_rand(shear_sigma, ell_trunc_max, ell_trunc_p, n)
+    intrinsic_shapes = Gaus_rand(shape_sigma,n)
+    shears = Gaus_rand(shear_sigma,n)
     measured_shears = (1+m)*shears + c
     
     if proper_shear_addition:
         shapes = add_ell_1d(intrinsic_shapes, measured_shears)
     else:
         shapes = intrinsic_shapes + measured_shears
+        
+    if contract:
+        shears = contract(shears,ell_trunc_max,ell_trunc_p)
+        shapes = contract(shapes,ell_trunc_max,ell_trunc_p)
     
     return shears, shapes

@@ -29,14 +29,17 @@ import cPickle
 
 from shear_calibration.mock_calibration import perform_multiple_mock_calibrations
 
+bayesian = True
+
 def main(argv):
     """ @TODO main docstring
     """
     
     test_ms = [-0.1, 0., 0.1]
+    # test_cs = [0.1]
     test_cs = [-0.1, 0., 0.1]
     
-    ncal = int(1e5)
+    ncal = int(1e6)
     n = int(1e4)
     
     for m in test_ms:
@@ -45,9 +48,13 @@ def main(argv):
             print("Testing for m="+str(m)+", c="+str(c)+"...")
             
             results = perform_multiple_mock_calibrations(ncal=ncal, n=n, m=m, c=c, seed=1, nproc=-1,
-                                                         second_order=False)
+                                                         second_order=False,
+                                                         bayesian=bayesian)
             
-            filename = "calibration_results_m_" + str(m) + "_c_" + str(c) + ".bin"
+            if bayesian:
+                filename = "calibration_results_bayesian_m_" + str(m) + "_c_" + str(c) + ".bin"
+            else:
+                filename = "calibration_results_m_" + str(m) + "_c_" + str(c) + ".bin"
             
             with open(filename,'wb') as fi:
                 cPickle.dump(results,fi)
