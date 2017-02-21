@@ -196,9 +196,16 @@ def main(argv):
                                 marker='x',s=markersize,label=label_1p,color=color)
                 
                     # Draw lines connecting points for successive calibrations
-                    ax.annotate("",xytext=(res["cp_sigma"],res["mp_sigma"]),xy=(res["cpp_sigma"],res["mpp_sigma"]),arrowprops=dict(arrowstyle="->",color=color))
+                    ax.annotate("",xytext=(res["cp_sigma"],res["mp_sigma"]),xy=(res["cpp_sigma"],res["mpp_sigma"]),
+                                arrowprops=dict(arrowstyle="->",color=color))
                     
-                ax.annotate("",xytext=(res["cm_sigma"],res["mm_sigma"]),xy=(res["cp_sigma"],res["mp_sigma"]),arrowprops=dict(arrowstyle="->",color=color))
+                # Also draw half-arrows for the first correction
+                ax.annotate("",xytext=(res["cm_sigma"],res["mm_sigma"]),
+                            xy=((res["cm_sigma"]+res["cp_sigma"])/2,(res["mm_sigma"]+res["mp_sigma"])/2),
+                            arrowprops=dict(arrowstyle="->",color=color))
+                ax.annotate("",xytext=((1.15*res["cm_sigma"]+res["cp_sigma"])/2.15,(1.15*res["mm_sigma"]+res["mp_sigma"])/2.15),
+                            xy=(res["cp_sigma"],res["mp_sigma"]),
+                            arrowprops=dict(arrowstyle="->",color=color))
                 
         ax.legend(loc='lower right',scatterpoints=1)
     
