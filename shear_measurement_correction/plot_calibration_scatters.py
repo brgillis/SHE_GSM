@@ -261,8 +261,10 @@ def main(argv):
         
         if calibration_set_size == "1e6":
             size_label = r"$n = 10^6$"
+            ylim = (-0.004,0.01)
         else:
             size_label = r"$n = 10^4$"
+            ylim = (-0.005,0.1)
         
         fig = pyplot.figure()
         fig.subplots_adjust(wspace=0, hspace=0, bottom=0.1, right=0.95, top=0.95, left=0.12)
@@ -272,6 +274,7 @@ def main(argv):
         ax.set_ylabel(r"$m$ or $\sigma[m]$",fontsize=fontsize)
         
         ax.set_xlim(-0.15,0.15)
+        ax.set_ylim(*ylim)
         
         # ax.set_yscale("symlog",linthreshy=0.001)
         
