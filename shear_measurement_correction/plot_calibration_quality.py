@@ -128,10 +128,6 @@ def main(argv):
         ax.set_xticks(xticks)
         ax.set_xticklabels(["None","1st-order","2nd-order"])
         
-    #     yticks = [lim_factor*0.07,lim_factor*0.08,lim_factor*0.09,lim_factor*0.10,]
-    #     ax.set_yticks(yticks)
-    #     ax.set_yticklabels(yticks)
-        
         ax.text(0.95,0.95,size_label,horizontalalignment='right',
                 verticalalignment='top',transform=ax.transAxes,
                 fontsize=24)
@@ -184,8 +180,15 @@ def main(argv):
                            facecolor='None',edgecolor=color)
                 
                 # Draw arrows connecting points
-                ax.annotate("",xytext=(0+x_offset,y),xy=(1+x_offset,Q_1),arrowprops=dict(arrowstyle="->",color=color))
-                ax.annotate("",xytext=(1+x_offset,Q_1),xy=(2+x_offset,Q_2),arrowprops=dict(arrowstyle="->",color=color))
+                ax.annotate("",xytext=(x_offset,y),xy=(1.15*(1+x_offset)/2.15,(y+1.15*Q_1)/2.15),
+                            arrowprops=dict(arrowstyle="->",color=color))
+                ax.annotate("",xytext=((1+x_offset)/2,(y+Q_1)/2),xy=(1+x_offset,Q_1),
+                            arrowprops=dict(arrowstyle="->",color=color))
+                
+                ax.annotate("",xytext=(1+x_offset,Q_1),xy=((1+x_offset+1.15*(2+x_offset))/2.15,(Q_1+1.15*Q_2)/2.15),
+                            arrowprops=dict(arrowstyle="->",color=color))
+                ax.annotate("",xytext=((1+x_offset+2+x_offset)/2,(Q_1+Q_2)/2),xy=(2+x_offset,Q_2),
+                            arrowprops=dict(arrowstyle="->",color=color))
     
         # Save the plot
         figname = ("both_" + calibration_set_size + "_qualities." + file_format)
