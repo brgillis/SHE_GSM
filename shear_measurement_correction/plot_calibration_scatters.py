@@ -271,7 +271,7 @@ def main(argv):
         
         ax = fig.add_subplot(1,1,1)
         ax.set_xlabel(r"$m$",fontsize=fontsize)
-        ax.set_ylabel(r"$m$ or $\sigma[m]$",fontsize=fontsize)
+        ax.set_ylabel(r"$m$ and $\sigma[m]$",fontsize=fontsize)
         
         ax.set_xlim(-0.15,0.15)
         ax.set_ylim(*ylim)
