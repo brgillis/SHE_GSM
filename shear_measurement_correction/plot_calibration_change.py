@@ -142,10 +142,15 @@ def main(argv):
                     for c in test_cs:
                         b_color = (c+0.1)/0.2
                         
+                        if calibration_order=="2nd":
+                            m2 = "s"
+                        else:
+                            m2 = 'o'
+                        
                         # Create a dummy label for the center point, colored black
                         if m==0 and c==0:
                             if measured_label=="Actual":
-                                ax.errorbar([-10],[-10], marker='o',markersize=markersize,
+                                ax.errorbar([-10],[-10], marker=m2,markersize=markersize,
                                             label=calibration_order+r"-order correction",
                                             linestyle="None",linewidth=2,
                                             markerfacecolor='None',markeredgecolor='k',color='k',
@@ -167,11 +172,6 @@ def main(argv):
                                         xerr=[res["c"+m_tag+"_sigma"]],
                                         yerr=[res["m"+m_tag+"_sigma"]])
                         else:
-                        
-                            if calibration_order=="2nd":
-                                m2 = "s"
-                            else:
-                                m2 = 'o'
                              
                             ax.errorbar([res["c"+m_tag+"p_mean"]],[res["m"+m_tag+"p_mean"]],
                                         marker=m2,markerfacecolor='None',markeredgecolor=color,
