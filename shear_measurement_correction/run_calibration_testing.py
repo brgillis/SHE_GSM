@@ -35,8 +35,8 @@ def main(argv):
     """ @TODO main docstring
     """
     
-    test_ms = [-0.1, 0., 0.1]
-    # test_cs = [0.1]
+    # test_ms = [-0.2, -0.1, 0., 0.1, 0.2]
+    test_ms = [-0.2, 0.2]
     test_cs = [-0.1, 0., 0.1]
     
     ncal = int(1e6)
