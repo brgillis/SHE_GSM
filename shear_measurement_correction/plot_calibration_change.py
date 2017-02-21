@@ -155,12 +155,6 @@ def main(argv):
                                             label=r"No correction",
                                             linestyle="None",linewidth=2,color='k',
                                             xerr=[1], yerr=[1])
-                             
-                            if (calibration_order=="1st") and (measured_label=="Actual"):
-                                ax.errorbar([-10],[-10],marker='x',markersize=markersize,color='k',
-                                            label=r"Predicted residual bias",
-                                            linestyle="None",linewidth=2,
-                                            xerr=[1], yerr=[1])
                         
                         color = (r_color,1-(r_color+b_color)/2,b_color)
                         
@@ -185,19 +179,6 @@ def main(argv):
                                         linestyle="None",linewidth=2,color=color,
                                         xerr=[res["c"+m_tag+"p_sigma"]],
                                         yerr=[res["m"+m_tag+"p_sigma"]])
-                        
-                        # If first-order, plotted expected biases as well
-                        if (calibration_order=="1st") and (measured_label=="Actual"):
-                            
-                            m = res["m_mean"]
-                            
-                            sigma_mm = 1/np.sqrt(float(calibration_set_size)) * ( sigma_gm/sigma_gs )
-                            
-                            c_prediction = 0
-                            m_prediction = sigma_mm**2*(1+m) + m**3
-                            
-                            ax.scatter([c_prediction],[m_prediction],
-                                       marker='x',s=pred_markersize,color=color,label=None)
                 
                 ax.legend(loc='lower right',fontsize=ticksize,
                           bbox_transform=ax.transAxes,numpoints=1,scatterpoints=1)
