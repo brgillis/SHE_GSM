@@ -37,7 +37,7 @@ matplotlib.rcParams['text.usetex'] = True
 
 from shear_calibration import magic_values as mv
     
-markersize = 100
+markersize = 400
 fontsize = 24
 file_format = "eps"
 paper_location = "/home/brg/Dropbox/gillis-comp-shared/Papers/Shear_Bias/"
@@ -71,7 +71,7 @@ def main(argv):
         results_dir_2 = "calibration_results_" + calibration_set_size + "_2nd"
         
         # Load in the calculated results
-        test_ms = [-0.1, 0., 0.1]
+        test_ms = [-0.2, -0.1, 0., 0.1, 0.2]
         test_cs = [-0.1, 0., 0.1]
         
         results = {}
@@ -135,7 +135,7 @@ def main(argv):
         # Plot the points
         
         for m in test_ms:
-            r_color = (m+0.1)/0.2
+            r_color = (m+0.2)/0.4
             for c in test_cs:
                 b_color = (c+0.1)/0.2
                 
@@ -170,13 +170,13 @@ def main(argv):
                 Qm_1 = np.sqrt(res["mp_mean"]**2 + res["mp_sigma"]**2)
                 Qc_1 = np.sqrt(res["cp_mean"]**2 + res["cp_sigma"]**2)
                 Q_1 = Qm_1 / m_target + Qc_1 / c_target
-                ax.scatter([1+x_offset],[Q_1], marker='o',s=markersize,color=color,
+                ax.scatter([1+x_offset],[Q_1], marker=(3, 0, 0),s=markersize,color=color,
                            facecolor='None',edgecolor=color)
                 
                 Qm_2 = np.sqrt(res["mpp_mean"]**2 + res["mpp_sigma"]**2)
                 Qc_2 = np.sqrt(res["cpp_mean"]**2 + res["cpp_sigma"]**2)
                 Q_2 = Qm_2 / m_target + Qc_2 / c_target
-                ax.scatter([2+x_offset],[Q_2], marker='s',s=markersize,color=color,
+                ax.scatter([2+x_offset],[Q_2], marker=(4, 0, 45),s=markersize,color=color,
                            facecolor='None',edgecolor=color)
                 
                 # Draw arrows connecting points
@@ -206,7 +206,7 @@ def main(argv):
     S2 = (mv.default_shape_sigma/mv.default_shear_sigma)**2
     
     d_vals = np.sqrt( (3/(N_vals**2) * S2**2)*(1+2*m_vals+m_vals**2) +
-                      1/N_vals * S2 * (1 - 2*m_vals - 3*m_vals**2 + 5*m_vals**3 + 5*m_vals**4) + m_vals**6)
+                      1/N_vals * S2 * (1 - 2*m_vals - 3*m_vals**2 + 5*m_vals**3 + 5*m_vals**4) + m_vals**6)/0.002
     
     # Set up the figure now
     fig = pyplot.figure()
@@ -221,7 +221,8 @@ def main(argv):
     ax.set_yscale("log",nonposy="clip")
     
     pyplot.pcolormesh(m_vals,N_vals,d_vals,norm=matplotlib.colors.LogNorm(),figure=fig)
-    pyplot.colorbar()
+    cb = pyplot.colorbar()
+    cb.set_label(r"$d_{m'}/m_{t\rm }$", fontsize=fontsize)
     
     req_N = S2 / (m_target**2 - m_vals**6) * ( 1 - 2*m_vals - 3*m_vals**2)
     

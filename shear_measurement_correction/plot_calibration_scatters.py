@@ -41,13 +41,16 @@ sigma_gm = mv.default_shape_sigma
 sigma_gs = mv.default_shear_sigma
     
 markersize = 400
+s_markersize = np.sqrt(markersize)
 fontsize = 24
 file_format = "eps"
 paper_location = "/home/brg/Dropbox/gillis-comp-shared/Papers/Shear_Bias/"
 
-m_min = -0.15
-m_max = 0.15
+m_min = -0.25
+m_max = 0.25
 m_points = 100
+
+m_target = 0.002
 
 bayesian = False
 
@@ -74,7 +77,7 @@ def main(argv):
         results_dir_b = results_dir_root + "_bayesian"
         
         # Load in the calculated results
-        test_ms = [-0.1, 0., 0.1]
+        test_ms = [-0.2, -0.1, 0., 0.1, 0.2]
         test_cs = [-0.1, 0., 0.1]
         
         results = {}
@@ -132,14 +135,14 @@ def main(argv):
             lim_factor = 1
         else:
             lim_factor = 0.1
-        ax.set_xlim(lim_factor*0.002,lim_factor*0.003)
-        ax.set_ylim(lim_factor*0.07,lim_factor*0.100)
+        ax.set_xlim(lim_factor*0.002,lim_factor*0.0032)
+        ax.set_ylim(lim_factor*0.055,lim_factor*0.111)
         
-        xticks = [lim_factor*0.002,lim_factor*0.0025,lim_factor*0.003,]
+        xticks = [lim_factor*0.002,lim_factor*0.0025,lim_factor*0.003]
         ax.set_xticks(xticks)
         ax.set_xticklabels(xticks)
         
-        yticks = [lim_factor*0.07,lim_factor*0.08,lim_factor*0.09,lim_factor*0.10,]
+        yticks = [lim_factor*0.06,lim_factor*0.07,lim_factor*0.08,lim_factor*0.09,lim_factor*0.10,lim_factor*0.11,]
         ax.set_yticks(yticks)
         ax.set_yticklabels(yticks)
         
@@ -150,7 +153,7 @@ def main(argv):
         # Plot the points
         
         for m in test_ms:
-            r_color = (m+0.1)/0.2
+            r_color = (m+0.2)/0.4
             for c in test_cs:
                 b_color = (c+0.1)/0.2
                 
@@ -163,12 +166,14 @@ def main(argv):
                     else:
                         label_1 = "1st-order correction"
                     label_1p = "Predicted 1st-order correction"
+                    label_2p = "Predicted 2nd-order correction"
                     color='k'
                 else:
                     label_0 = None
                     label_1 = None
                     label_2 = None
                     label_1p = None
+                    label_2p = None
                     color = (r_color,1-(r_color+b_color)/2,b_color)
                 
                 
@@ -178,12 +183,12 @@ def main(argv):
                             marker='.',s=markersize,label=label_0,color=color)
                 
                 ax.scatter([res["cp_sigma"]],[res["mp_sigma"]],
-                            marker='o',facecolor='None',edgecolor=color,
+                            marker=(3, 0, 0),facecolor='None',edgecolor=color,
                             s=markersize,label=label_1,color=color)
                 
                 if not bayesian:
                     ax.scatter([res["cpp_sigma"]],[res["mpp_sigma"]],
-                                marker='s',facecolor='None',edgecolor=color,
+                                marker=(4, 0, 45),facecolor='None',edgecolor=color,
                                 s=markersize,label=label_2,color=color)
                 
                     sigma_mm = 1/np.sqrt(float(calibration_set_size)) * ( sigma_gm/sigma_gs )
@@ -192,8 +197,14 @@ def main(argv):
                     pred_cp_sigma = sigma_cm * (1 - m + m**2 + 1.5*sigma_mm**2)
                     pred_mp_sigma = sigma_mm * (1 - m - 2*m**2 + sigma_mm**2)
                     
+                    pred_cpp_sigma = pred_cp_sigma * (1 - sigma_mm**2 + 2*m*sigma_mm**2 - m**3)
+                    pred_mpp_sigma = sigma_mm * (1 - m + m**2 + sigma_mm**2)
+                    
                     ax.scatter([pred_cp_sigma],[pred_mp_sigma],
-                                marker='x',s=markersize,label=label_1p,color=color)
+                                marker=(3, 2, 0),s=markersize,label=label_1p,color=color)
+                    
+                    ax.scatter([pred_cpp_sigma],[pred_mpp_sigma],
+                                marker=(4, 2, 45),s=markersize,label=label_2p,color=color)
                 
                     # Draw lines connecting points for successive calibrations
                     ax.annotate("",xytext=(res["cp_sigma"],res["mp_sigma"]),
@@ -261,24 +272,24 @@ def main(argv):
         
         if calibration_set_size == "1e6":
             size_label = r"$n = 10^6$"
-            ylim = (-0.004,0.01)
+            ylim = (-0.010,0.012)
         else:
             size_label = r"$n = 10^4$"
-            ylim = (-0.005,0.1)
+            ylim = (-0.010,0.12)
         
         fig = pyplot.figure()
         fig.subplots_adjust(wspace=0, hspace=0, bottom=0.1, right=0.95, top=0.95, left=0.12)
         
         ax = fig.add_subplot(1,1,1)
         ax.set_xlabel(r"$m$",fontsize=fontsize)
-        ax.set_ylabel(r"$m$ and $\sigma[m]$",fontsize=fontsize)
+        ax.set_ylabel(r"$m'$, $m''$, $\sigma[m']$, and $\sigma[m'']$",fontsize=fontsize)
         
-        ax.set_xlim(-0.15,0.15)
+        ax.set_xlim(m_min,m_max)
         ax.set_ylim(*ylim)
         
         # ax.set_yscale("symlog",linthreshy=0.001)
         
-        ax.text(0.05,0.85,size_label,horizontalalignment='left',
+        ax.text(0.5,0.95,size_label,horizontalalignment='center',
                 verticalalignment='top',transform=ax.transAxes,
                 fontsize=24)
             
@@ -288,25 +299,39 @@ def main(argv):
         
         n = float(calibration_set_size)
         expec_mp_vals = S**2/n * (1 + m_vals) + m_vals**3
+        expec_mpp_vals = S**2/n * (S**2/n + 3*m_vals**2) + m_vals**6
         sigma_mp_vals = S/np.sqrt(n) * (1 - m_vals - 2*m_vals**2 + S**2/n)
-        
-        ax.plot(m_vals,expec_mp_vals,color='r',linestyle="solid",label=r"$\left<m'\right>$")
-        ax.plot(m_vals,sigma_mp_vals,color='b',linestyle="dashed",label=r"$\left<\sigma\left[m'\right]\right>$")
-        ax.plot(m_vals,np.zeros_like(m_vals),color='k',linestyle="solid")
+        sigma_mpp_vals = S/np.sqrt(n) * (1 - m_vals + m_vals**2 + S**2/n)
         
         test_mp_means = []
-        test_sigma_m_means = []
+        test_mpp_means = []
+        test_sigma_mp_means = []
+        test_sigma_mpp_means = []
         
         for m in test_ms:
             test_mp_means.append(all_res[calibration_set_size][(0.,m)]["mp_mean"])
-            test_sigma_m_means.append(all_res[calibration_set_size][(0.,m)]["mp_sigma"])
-            
-        ax.scatter(test_ms,test_mp_means,color='r',label=r"$\overline{\hat{m}'}$",
-                   marker='o',s=markersize,facecolor='None')
-        ax.scatter(test_ms,test_sigma_m_means,color='b',label=r"$\sigma\left[\hat{m}'\right]$",
-                   marker='o',s=markersize,facecolor='None')
+            test_mpp_means.append(all_res[calibration_set_size][(0.,m)]["mpp_mean"])
+            test_sigma_mp_means.append(all_res[calibration_set_size][(0.,m)]["mp_sigma"])
+            test_sigma_mpp_means.append(all_res[calibration_set_size][(0.,m)]["mpp_sigma"])
         
-        ax.legend(loc="center left",scatterpoints=1)
+        ax.plot(m_vals,expec_mp_vals,color='r',linestyle="solid",linewidth=1,label=r"$\left<m'\right>$")
+        ax.plot(m_vals,expec_mpp_vals,color='r',linestyle="solid",linewidth=2,label=r"$\left<m''\right>$")
+        ax.plot(test_ms,test_mp_means,markeredgecolor='r',linestyle='none',label=r"$\overline{\hat{m}'}$",
+                   marker=(3, 0, 0),markersize=s_markersize,markerfacecolor='None')
+        ax.plot(test_ms,test_mpp_means,markeredgecolor='r',linestyle='none',label=r"$\overline{\hat{m}''}$",
+                   marker=(4, 0, 45),markersize=s_markersize,markerfacecolor='None')
+        
+        ax.plot(m_vals,sigma_mp_vals,color ='b',linestyle="dashed",linewidth=1,label=r"$\left<\sigma\left[m'\right]\right>$")
+        ax.plot(m_vals,sigma_mpp_vals,color ='b',linestyle="dashed",linewidth=2,label=r"$\left<\sigma\left[m''\right]\right>$")
+        ax.plot(test_ms,test_sigma_mp_means,markeredgecolor='b',linestyle='none',label=r"$\sigma\left[\hat{m}'\right]$",
+                   marker=(3, 0, 0),markersize=s_markersize,markerfacecolor='None')
+        ax.plot(test_ms,test_sigma_mpp_means,markeredgecolor='b',linestyle='none',label=r"$\sigma\left[\hat{m}''\right]$",
+                   marker=(4, 0, 45),markersize=s_markersize,markerfacecolor='None')
+        
+        # Draw the zero line
+        ax.plot(m_vals,np.zeros_like(m_vals),color='k',linestyle="solid")
+        
+        ax.legend(loc="center left",numpoints=1)
         
         # Save the plot
         figname = ("both_" + calibration_set_size + "_proj_m_scatters." + file_format)

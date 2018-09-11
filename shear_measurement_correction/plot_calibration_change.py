@@ -53,6 +53,7 @@ def main(argv):
     
     for calibration_set_size in ("1e4","1e6"):
         for calibration_order in ("1st","2nd"):
+        # for calibration_order in ("bayesian",):
     
             if len(argv) > 1:
                 calibration_set_size = argv[1]
@@ -69,7 +70,7 @@ def main(argv):
             results_dir = "calibration_results_" + calibration_set_size + "_" + calibration_order
             
             # Load in the calculated results
-            test_ms = [-0.1, 0., 0.1]
+            test_ms = [-0.2, -0.1, 0., 0.1, 0.2]
             test_cs = [-0.1, 0., 0.1]
             
             
@@ -80,6 +81,7 @@ def main(argv):
                 for c in test_cs:
                     
                     filename = join(results_dir,"calibration_results_m_" + str(m) + "_c_" + str(c) + ".bin")
+                    # filename = join(results_dir,"calibration_results_bayesian_m_" + str(m) + "_c_" + str(c) + ".bin")
                     
                     with open(filename,'rb') as fi:
                         new_res = cPickle.load(fi)
@@ -99,7 +101,11 @@ def main(argv):
                 fig.subplots_adjust(wspace=0, hspace=0, bottom=0.1, right=0.95, top=0.95, left=0.12)
                 
                 ax = fig.add_subplot(1,1,1)
-                ax.set_xlabel(measured_label + r" $c$",fontsize=fontsize)
+                if measured_label=="Measured":
+                    xlabel = "Measured $c + 0.01m$"
+                else:
+                    xlabel = "Actual $c$"
+                ax.set_xlabel(xlabel,fontsize=fontsize)
                 ax.set_ylabel(measured_label + r" $m$",fontsize=fontsize)
                 
                 actual_xlim = 0.005*cal_scale
@@ -107,9 +113,9 @@ def main(argv):
                 
                 if measured_label=="Measured":
                     ax.set_xlim(-0.11,0.11)
-                    ax.set_ylim(-0.21,0.21)
+                    ax.set_ylim(-0.31,0.31)
                     xticks = [-0.1,-0.05,0,0.05,0.1]
-                    yticks = [-0.2,-0.1,0,0.1,0.2]
+                    yticks = [-0.3,-0.2,-0.1,0,0.1,0.2,0.3]
                 else:
                     ax.set_xlim(-actual_xlim,actual_xlim)
                     ax.set_ylim(-actual_ylim,actual_ylim)
@@ -128,7 +134,11 @@ def main(argv):
                 
                 # Draw axes
                 ax.plot([-1,1],[0,0],label=None,color=(0.5,0.5,0.5),linestyle="solid",linewidth=0.5)
-                ax.plot([0,0],[-1,1],label=None,color=(0.5,0.5,0.5),linestyle="solid",linewidth=0.5)
+                
+                if measured_label=="Measured":
+                    ax.plot([-0.01,0.01],[-1,1],label=None,color=(0.5,0.5,0.5),linestyle="solid",linewidth=0.5)
+                else:
+                    ax.plot([0,0],[-1,1],label=None,color=(0.5,0.5,0.5),linestyle="solid",linewidth=0.5)
                 
                 # If Measured, draw the box for where the Actual plots will be
                 ax.plot([actual_xlim,actual_xlim,-actual_xlim,-actual_xlim,actual_xlim],
@@ -138,7 +148,7 @@ def main(argv):
                 # Plot the points
                 
                 for m in test_ms:
-                    r_color = (m+0.1)/0.2
+                    r_color = (m+0.2)/0.4
                     for c in test_cs:
                         b_color = (c+0.1)/0.2
                         
@@ -152,13 +162,14 @@ def main(argv):
                             if measured_label=="Actual":
                                 ax.errorbar([-10],[-10], marker=m2,markersize=markersize,
                                             label=calibration_order+r"-order correction",
-                                            linestyle="None",linewidth=2,
+                                            linestyle="None",linewidth=2,capthick=2,
                                             markerfacecolor='None',markeredgecolor='k',color='k',
                                             xerr=[1], yerr=[1])
                             else:
                                 ax.errorbar([-10],[-10], marker='.',markersize=markersize,
                                             label=r"No correction",
-                                            linestyle="None",linewidth=2,color='k',
+                                            linestyle="None",linewidth=2,
+                                            capthick=2,color='k',
                                             xerr=[1], yerr=[1])
                         
                         color = (r_color,1-(r_color+b_color)/2,b_color)
@@ -166,17 +177,20 @@ def main(argv):
                         res = results[(c,m)]
                         
                         if measured_label=="Measured":
-                            ax.errorbar([res["c"+m_tag+"_mean"]],[res["m"+m_tag+"_mean"]],
+                            ax.errorbar([res["c"+m_tag+"_mean"]+0.01*res["m"+m_tag+"_mean"]],[res["m"+m_tag+"_mean"]],
                                         marker='.',markersize=markersize,label=None,
-                                        linestyle="None",linewidth=2,color=color,
+                                        linestyle="None",linewidth=1,
+                                        capthick=1,capsize=4,color=color,
                                         xerr=[res["c"+m_tag+"_sigma"]],
                                         yerr=[res["m"+m_tag+"_sigma"]])
                         else:
                              
-                            ax.errorbar([res["c"+m_tag+"p_mean"]],[res["m"+m_tag+"p_mean"]],
+                            ax.errorbar([res["c"+m_tag+"p_mean"]],
+                                        [res["m"+m_tag+"p_mean"]],
                                         marker=m2,markerfacecolor='None',markeredgecolor=color,
                                         markersize=markersize,label=None,
-                                        linestyle="None",linewidth=2,color=color,
+                                        linestyle="None",linewidth=2,
+                                        capthick=2,capsize=4,color=color,
                                         xerr=[res["c"+m_tag+"p_sigma"]],
                                         yerr=[res["m"+m_tag+"p_sigma"]])
                 

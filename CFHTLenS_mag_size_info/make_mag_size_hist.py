@@ -28,6 +28,7 @@ import numpy as np
 from os.path import join
 
 from astropy.io import fits
+from astropy import table
 
 from find_data_dir import determine_data_dir
 from get_fields import get_fields
@@ -62,12 +63,18 @@ def main(argv):
     # Loop through all tables in this directory
     field_names = get_fields(data_dir)
     
+    all_tables = []
+    
     for field_name in field_names:
         # Get the table name
         table_filename = join(data_dir,"filtered_tables",field_name[0:-2] + "_mag_size.fits")
     
         # Load in the data
-        data = fits.open(table_filename)[1].data
+        data = table.Table.read(table_filename)
+        for key in data.colnames:
+            if (key != 'MAG_i') and (key != 'sigma_arcsec'):
+                data.remove_column(key)
+        all_tables.append(data)
         
         mags = data['MAG_i']
         sizes = data['sigma_arcsec']
@@ -86,7 +93,11 @@ def main(argv):
             combined_hist2D += hist2D
             
         print("Added data from file " + table_filename + ".")
-    
+        
+    combined_table = table.vstack(all_tables)
+    combined_table.write(join(data_dir,mag_size_subdir,'combined_mag_size_table.fits'),
+                         format='fits')
+                
     # Normalize the histogram
     combined_hist2D /= combined_hist2D.sum()
     

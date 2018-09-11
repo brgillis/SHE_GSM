@@ -32,7 +32,7 @@ def calibrate_shear(g, m=0., c=0., sigma_m=1., sigma_c=1.,
     if not second_order:
         return gp
     else:
-        gpp = gp * ( 1. - sigma_m**2*(1+m) - m**3 ) # Second-order correction
+        gpp = gp * ( 1. - sigma_m**2*(1-2*m) - m**3 ) # Second-order correction
         return gpp
     
 def P_of_g_given_mm_cm(g, gm, mm=0., cm=0., sigma_g=1., sigma_m=1., sigma_c=1.):
