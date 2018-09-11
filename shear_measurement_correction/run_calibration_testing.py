@@ -30,7 +30,7 @@ import sys
 from shear_calibration.mock_calibration import perform_multiple_mock_calibrations
 
 
-bayesian = True
+bayesian = False
 second_order = False
 
 
@@ -38,25 +38,37 @@ def main(argv):
     """ @TODO main docstring
     """
 
-    test_ms = [-0.01, -0.005, 0., 0.005, 0.01]
-    test_cs = [0., ]
+    test_ms = [-0.01, -0.005, 0.005, 0.01]
+    test_cs = [-0.1, 0., 0.1]
 
-    ncal = int(1e6)
-    n = int(1e4)
+    ncal = int(1e5)
+    n = int(1e6)
+
+    dirname = "calibration_results_N_ORDER/"
+    if n == int(1e4):
+        dirname = dirname.replace("N", "1e4")
+    elif n == int(1e6):
+        dirname = dirname.replace("N", "1e6")
+    else:
+        raise ValueError("Unexpected N")
+    if second_order:
+        dirname = dirname.replace("ORDER", "2nd")
+    else:
+        dirname = dirname.replace("ORDER", "1st")
 
     for m in test_ms:
         for c in test_cs:
 
             print("Testing for m=" + str(m) + ", c=" + str(c) + "...")
 
-            results = perform_multiple_mock_calibrations(ncal=ncal, n=n, m=m, c=c, seed=1, nproc=-1,
+            results = perform_multiple_mock_calibrations(ncal=ncal, n=n, m=m, c=c, seed=1, nproc=1,
                                                          second_order=second_order,
-                                                         bayesian=bayesian)
+                                                         bayesian=bayesian,)
 
             if bayesian:
-                filename = "calibration_results_bayesian_m_" + str(m) + "_c_" + str(c) + ".bin"
+                filename = dirname + "calibration_results_bayesian_m_" + str(m) + "_c_" + str(c) + ".bin"
             else:
-                filename = "calibration_results_m_" + str(m) + "_c_" + str(c) + ".bin"
+                filename = dirname + "calibration_results_m_" + str(m) + "_c_" + str(c) + ".bin"
 
             with open(filename, 'wb') as fi:
                 cPickle.dump(results, fi)
