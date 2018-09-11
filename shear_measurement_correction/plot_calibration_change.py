@@ -74,7 +74,8 @@ def main(argv):
             results_dir = "calibration_results_" + calibration_set_size + "_" + calibration_order
 
             # Load in the calculated results
-            test_ms = [-0.2, -0.1, -0.01, -0.005, 0., 0.005, 0.01, 0.1, 0.2]
+            # test_ms = [-0.2, -0.1, -0.01, -0.005, 0., 0.005, 0.01, 0.1, 0.2]
+            test_ms = [-0.2, -0.1, 0., 0.1, 0.2]
             c = 0.
 
             results = {}
@@ -130,13 +131,15 @@ def main(argv):
 
                 if calibration_order == "2nd":
                     m2 = (4, 0, 45)
+                    calib_label = r"$m''$ from mock calibration"
                 else:
                     m2 = (3, 0, 0)
+                    calib_label = r"$m'$ from mock calibration"
 
                 # Create a dummy label for the center point, colored black
                 if m == 0 and c == 0:
                     ax.errorbar([-10], [-10], marker=m2, markersize=markersize,
-                                label=calibration_order + r"-order correction",
+                                label=calib_label,
                                 linestyle="None", linewidth=2, capthick=2,
                                 markerfacecolor='None', markeredgecolor='k', color='k',
                                 yerr=[1])
@@ -152,6 +155,19 @@ def main(argv):
                             linestyle="None", linewidth=2,
                             capthick=2, capsize=4, color=color,
                             yerr=[res["mp_sigma"]])
+
+            # Plot predicted points
+            m_vals = np.linspace(-xlim, xlim, 100)
+            if calibration_order == "1st":
+                pred_mp = res["mm_sigma"]**2 * (1 + m_vals) + m_vals**3
+                pred_label = "Predicted $m'$"
+            else:
+                m = m_vals
+                sm = res["mm_sigma"]
+                pred_mp = sm**2 * (sm**2 + 3 * m**2 - 7 * m * sm**2 - 5 * m**3 - 8 * sm**4 + 8 * m**4) - m**6
+                pred_label = "Predicted $m'$"
+
+            ax.plot(m_vals, pred_mp, label=pred_label, color=(0, 0, 0), linestyle="dashed", linewidth=0.5)
 
             ax.legend(loc='lower right', fontsize=ticksize,
                       bbox_transform=ax.transAxes, numpoints=1, scatterpoints=1)
