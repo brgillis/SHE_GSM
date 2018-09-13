@@ -74,8 +74,7 @@ def main(argv):
             results_dir = "calibration_results_" + calibration_set_size + "_" + calibration_order
 
             # Load in the calculated results
-            # test_ms = [-0.2, -0.1, -0.01, -0.005, 0., 0.005, 0.01, 0.1, 0.2]
-            test_ms = [-0.2, -0.1, 0., 0.1, 0.2]
+            test_ms = [-0.2, -0.1, -0.01, -0.005, 0., 0.005, 0.01, 0.1, 0.2]
             c = 0.
 
             results = {}
@@ -127,7 +126,8 @@ def main(argv):
             for m in test_ms:
                 r_color = (m + 0.2) / 0.4
                 # b_color = (c + 0.1) / 0.2
-                b_color = (m + 0.2) / 0.4
+                # b_color = (m + 0.2) / 0.4
+                b_color = 1
 
                 if calibration_order == "2nd":
                     m2 = (4, 0, 45)
