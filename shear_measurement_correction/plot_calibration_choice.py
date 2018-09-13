@@ -90,6 +90,11 @@ def main(argv):
     ax.fill_between(m_hat[m_hat <= -m_sigma], p_m_hat[m_hat <= -m_sigma], color=(1.0, 0.5, 0.5))
     ax.fill_between(m_hat[m_hat >= m_sigma], p_m_hat[m_hat >= m_sigma], color=(1.0, 0.5, 0.5))
 
+    # Label the plot
+    ax.text(0.06, 0.97, r"Measured $\hat{m}$", horizontalalignment='left',
+            verticalalignment='top', transform=ax.transAxes,
+            fontsize=24)
+
     # Save the plot
     figname = "calibration_choice_m_hat." + file_format
     if file_format == "eps" or file_format == "pdf":
@@ -128,6 +133,11 @@ def main(argv):
     ax.fill_between(mp[np.abs(m_hat) < m_sigma], p_mp[(np.abs(m_hat) < m_sigma)[:-1]], color=(0.5, 0.5, 1.0))
     ax.fill_between(mp[m_hat <= -m_sigma], p_mp[(m_hat <= -m_sigma)[:-1]], color=(1.0, 0.5, 0.5))
     ax.fill_between(mp[m_hat >= m_sigma][:-1], p_mp[(m_hat >= m_sigma)[:-1]], color=(1.0, 0.5, 0.5))
+
+    # Label the plot
+    ax.text(0.06, 0.97, r"Post-calibration $m'$", horizontalalignment='left',
+            verticalalignment='top', transform=ax.transAxes,
+            fontsize=24)
 
     # Save the plot
     figname = "calibration_choice_mp." + file_format
@@ -180,6 +190,11 @@ def main(argv):
     ax.fill_between(m_hat, pmq_l + pmq_r + pmq_c, pmq_l + pmq_r, color=(0.5, 0.5, 1.0))
     ax.fill_between(m_hat, pmq_l, 0, color=(1.0, 0.5, 0.5))
     ax.fill_between(m_hat, pmq_r, 0, color=(1.0, 0.5, 0.5))
+
+    # Label the plot
+    ax.text(0.06, 0.97, r"Post-conditional-calibration $m^?$", horizontalalignment='left',
+            verticalalignment='top', transform=ax.transAxes,
+            fontsize=24)
 
     # Save the plot
     figname = "calibration_choice_mq." + file_format

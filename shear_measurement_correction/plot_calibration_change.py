@@ -165,7 +165,7 @@ def main(argv):
                 m = m_vals
                 sm = res["mm_sigma"]
                 pred_mp = sm**2 * (sm**2 + 3 * m**2 - 7 * m * sm**2 - 5 * m**3 - 8 * sm**4 + 8 * m**4) - m**6
-                pred_label = "Predicted $m'$"
+                pred_label = "Predicted $m''$"
 
             ax.plot(m_vals, pred_mp, label=pred_label, color=(0, 0, 0), linestyle="dashed", linewidth=0.5)
 
