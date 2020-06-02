@@ -47,7 +47,7 @@ markersize = 12
 pred_markersize = 64
 fontsize = 24
 ticksize = 16
-file_format = "pdf"
+file_format = "eps"
 paper_location = "/home/brg/Dropbox/gillis-comp-shared/Papers/Shear_Bias/"
 
 
@@ -74,15 +74,15 @@ def main(argv):
             results_dir = "calibration_results_" + calibration_set_size + "_" + calibration_order
 
             # Load in the calculated results
-            test_ms = [-0.2, -0.1, -0.01, -0.005, 0., 0.005, 0.01, 0.1, 0.2]
-            c = 0.
+            test_ms = [-0.2, -0.1, -0.01, 0., 0.01, 0.1, 0.2]
+            c = 0.1
 
             results = {}
 
             for m in test_ms:
 
                 filename = join(results_dir, "calibration_results_m_" + str(m) + "_c_" + str(c) + ".bin")
-                # filename = join(results_dir,"calibration_results_bayesian_m_" + str(m) + "_c_" + str(c) + ".bin")
+                # filename = join(results_dir, "calibration_results_bayesian_m_" + str(m) + "_c_" + str(c) + ".bin")
 
                 with open(filename, 'rb') as fi:
                     new_res = cPickle.load(fi)
@@ -98,6 +98,13 @@ def main(argv):
             ax = fig.add_subplot(1, 1, 1)
             ax.set_xlabel(r"Uncalibrated $m$", fontsize=fontsize)
             ax.set_ylabel(r"Post-calibration $m$", fontsize=fontsize)
+
+            if calibration_order == "2nd":
+                ax.set_ylabel(r"Post-calibration $m''$", fontsize=fontsize)
+            elif calibration_order == "bayesian":
+                ax.set_ylabel(r"Post-calibration $m^{\rm b}$", fontsize=fontsize)
+            else:
+                ax.set_ylabel(r"Post-calibration $m'$", fontsize=fontsize)
 
             xlim = 0.31
             ylim = 0.12 * cal_scale
@@ -132,6 +139,9 @@ def main(argv):
                 if calibration_order == "2nd":
                     m2 = (4, 0, 45)
                     calib_label = r"$m''$ from mock calibration"
+                elif calibration_order == "bayesian":
+                    m2 = (3, 0, 0)
+                    calib_label = r"$m^{\rm b}$ from mock calibration"
                 else:
                     m2 = (3, 0, 0)
                     calib_label = r"$m'$ from mock calibration"
@@ -159,6 +169,9 @@ def main(argv):
             # Plot predicted points
             m_vals = np.linspace(-xlim, xlim, 100)
             if calibration_order == "1st":
+                pred_mp = res["mm_sigma"]**2 * (1 + m_vals) + m_vals**3
+                pred_label = "Predicted $m'$"
+            elif calibration_order == "bayesian":
                 pred_mp = res["mm_sigma"]**2 * (1 + m_vals) + m_vals**3
                 pred_label = "Predicted $m'$"
             else:

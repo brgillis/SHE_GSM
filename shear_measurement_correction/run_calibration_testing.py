@@ -30,7 +30,7 @@ import sys
 from shear_calibration.mock_calibration import perform_multiple_mock_calibrations
 
 
-bayesian = False
+bayesian = True
 second_order = False
 
 
@@ -38,11 +38,11 @@ def main(argv):
     """ @TODO main docstring
     """
 
-    test_ms = [0.005, 0.01]
-    test_cs = [-0.1, 0., 0.1]
+    test_ms = [-0.01, 0.005, 0.005, 0.01]
+    test_cs = [0.1]
 
-    ncal = int(1e5)
-    n = int(1e6)
+    ncal = int(1e6)
+    n = int(1e4)
 
     dirname = "calibration_results_N_ORDER/"
     if n == int(1e4):
@@ -61,7 +61,7 @@ def main(argv):
 
             print("Testing for m=" + str(m) + ", c=" + str(c) + "...")
 
-            results = perform_multiple_mock_calibrations(ncal=ncal, n=n, m=m, c=c, seed=1, nproc=2,
+            results = perform_multiple_mock_calibrations(ncal=ncal, n=n, m=m, c=c, seed=1, nproc=1,
                                                          second_order=second_order,
                                                          bayesian=bayesian,)
 

@@ -46,7 +46,7 @@ sigma_gs = mv.default_shear_sigma
 markersize = 400
 s_markersize = np.sqrt(markersize)
 fontsize = 24
-file_format = "pdf"
+file_format = "eps"
 paper_location = "/home/brg/Dropbox/gillis-comp-shared/Papers/Shear_Bias/"
 
 m_min = -0.22
@@ -81,7 +81,7 @@ def main(argv):
         results_dir_b = results_dir_root + "_bayesian"
 
         # Load in the calculated results
-        test_ms = [-0.2, -0.1, -0.01, -0.005, 0., 0.005, 0.01, 0.1, 0.2]
+        test_ms = [-0.2, -0.1, 0., 0.1, 0.2]
         test_cs = [-0.1, 0.0, 0.1]
 
         results = {}
@@ -229,48 +229,48 @@ def main(argv):
 
         ax.legend(loc='lower right', scatterpoints=1)
 
-#         # Save the plot
-#         figname = ("both_" + calibration_set_size + "_scatters." + file_format)
-#         if file_format == "eps" or file_format == "pdf":
-#             # Save in the paper location
-#             figname = join(paper_location, figname)
-#         pyplot.savefig(figname, format=file_format, bbox_inches="tight", pad_inches=0.05)
+        # Save the plot
+        figname = ("both_" + calibration_set_size + "_scatters." + file_format)
+        if file_format == "eps" or file_format == "pdf":
+            # Save in the paper location
+            figname = join(paper_location, figname)
+        pyplot.savefig(figname, format=file_format, bbox_inches="tight", pad_inches=0.05)
 
         fig.show()
 
-        if not bayesian:
-
-            # Save a table of the data as well
-            tabname = join(paper_location, "table_data_" + calibration_set_size + ".tex")
-
-            with open(tabname, 'w') as fo:
-
-                # Print the header portion
-                line = ("\\begin{center}\n" +
-                        "\\begin{tabular}{rrrrrrrrrrrrrr}\n" +
-                        "$m$ & $c$ & $\\overline{\hat{m}}$ & $\\overline{m'}$ & $\\overline{m''}$ & $\\std{\hat{m}}$" +
-                        "& $\\std{m'}$ & $\\std{m''}$ & $\\overline{\hat{c}}$ & $\\overline{c'}$ & $\\overline{c''}$ & $\\std{\hat{c}}$ & $\\std{c'}$ & $\\std{c''}$ \\\\ \\hline\n")
-
-                fo.write(line)
-
-                for m in test_ms:
-                    for c in test_cs:
-                        res = results[(c, m)]
-                        line = (" %1.1f & %1.1f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f" %
-                                (m, c, res["mm_mean"], res["mp_mean"], res["mpp_mean"], res["mm_sigma"], res["mp_sigma"], res["mpp_sigma"],
-                                 res["cm_mean"], res["cp_mean"], res["cpp_mean"], res["cm_sigma"], res["cp_sigma"], res["cpp_sigma"]))
-
-                        # Unless it's the last one, add a linebreak
-                        if (m, c) is not (test_ms[-1], test_cs[-1]):
-                            line += " \\\\"
-
-                        line += "\n"
-
-                        fo.write(line)
-
-                # Print the footer portion
-                fo.write("\\end{tabular}\n" +
-                         "\\end{center}\n")
+#         if not bayesian:
+#
+#             # Save a table of the data as well
+#             tabname = join(paper_location, "table_data_" + calibration_set_size + ".tex")
+#
+#             with open(tabname, 'w') as fo:
+#
+#                 # Print the header portion
+#                 line = ("\\begin{center}\n" +
+#                         "\\begin{tabular}{rrrrrrrrrrrrrr}\n" +
+#                         "$m$ & $c$ & $\\overline{\hat{m}}$ & $\\overline{m'}$ & $\\overline{m''}$ & $\\std{\hat{m}}$" +
+#                         "& $\\std{m'}$ & $\\std{m''}$ & $\\overline{\hat{c}}$ & $\\overline{c'}$ & $\\overline{c''}$ & $\\std{\hat{c}}$ & $\\std{c'}$ & $\\std{c''}$ \\\\ \\hline\n")
+#
+#                 fo.write(line)
+#
+#                 for m in test_ms:
+#                     for c in test_cs:
+#                         res = results[(c, m)]
+#                         line = (" %1.3f & %1.1f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f & %1.4f" %
+#                                 (m, c, res["mm_mean"], res["mp_mean"], res["mpp_mean"], res["mm_sigma"], res["mp_sigma"], res["mpp_sigma"],
+#                                  res["cm_mean"], res["cp_mean"], res["cpp_mean"], res["cm_sigma"], res["cp_sigma"], res["cpp_sigma"]))
+#
+#                         # Unless it's the last one, add a linebreak
+#                         if (m, c) is not (test_ms[-1], test_cs[-1]):
+#                             line += " \\\\"
+#
+#                         line += "\n"
+#
+#                         fo.write(line)
+#
+#                 # Print the footer portion
+#                 fo.write("\\end{tabular}\n" +
+#                          "\\end{center}\n")
 
     # Now set up a figure of sigma(m) versus m
 
@@ -278,17 +278,17 @@ def main(argv):
 
         if calibration_set_size == "1e6":
             size_label = r"$n = 10^6$"
-            ylim = (-0.010, 0.012)
+            ylim = (0.0055, 0.011)
         else:
             size_label = r"$n = 10^4$"
-            ylim = (-0.010, 0.12)
+            ylim = (0.055, 0.11)
 
         fig = pyplot.figure()
         fig.subplots_adjust(wspace=0, hspace=0, bottom=0.1, right=0.95, top=0.95, left=0.12)
 
         ax = fig.add_subplot(1, 1, 1)
         ax.set_xlabel(r"$m$", fontsize=fontsize)
-        ax.set_ylabel(r"$m'$, $m''$, $\sigma[m']$, and $\sigma[m'']$", fontsize=fontsize)
+        ax.set_ylabel(r"$\sigma[m']$ and $\sigma[m'']$", fontsize=fontsize)
 
         ax.set_xlim(m_min, m_max)
         ax.set_ylim(*ylim)
@@ -320,35 +320,49 @@ def main(argv):
             test_sigma_mp_means.append(all_res[calibration_set_size][(0., m)]["mp_sigma"])
             test_sigma_mpp_means.append(all_res[calibration_set_size][(0., m)]["mpp_sigma"])
 
-        ax.plot(m_vals, expec_mp_vals, color='r', linestyle="solid", linewidth=1, label=r"$\left<m'\right>$")
-        ax.plot(m_vals, expec_mpp_vals, color='r', linestyle="solid", linewidth=2, label=r"$\left<m''\right>$")
-        ax.plot(test_ms, test_mp_means, markeredgecolor='r', linestyle='none', label=r"$\overline{\hat{m}'}$",
-                marker=(3, 0, 0), markersize=s_markersize, markerfacecolor='None')
-        ax.plot(test_ms, test_mpp_means, markeredgecolor='r', linestyle='none', label=r"$\overline{\hat{m}''}$",
-                marker=(4, 0, 45), markersize=s_markersize, markerfacecolor='None')
+#         ax.plot(m_vals, expec_mp_vals, color='r', linestyle="solid", linewidth=1, label=r"$\left<m'\right>$")
+#         ax.plot(m_vals, expec_mpp_vals, color='r', linestyle="solid", linewidth=2, label=r"$\left<m''\right>$")
+#         ax.plot(test_ms, test_mp_means, markeredgecolor='r', linestyle='none', label=r"$\overline{\hat{m}'}$",
+#                 marker=(3, 0, 0), markersize=s_markersize, markerfacecolor='None')
+#         ax.plot(test_ms, test_mpp_means, markeredgecolor='r', linestyle='none', label=r"$\overline{\hat{m}''}$",
+#                 marker=(4, 0, 45), markersize=s_markersize, markerfacecolor='None')
 
-        ax.plot(m_vals, sigma_mp_vals, color='b', linestyle="dashed",
+        ax.plot(m_vals, sigma_mp_vals, color='k', linestyle="dashed",
                 linewidth=1, label=r"$\left<\sigma\left[m'\right]\right>$")
-        ax.plot(m_vals, sigma_mpp_vals, color='b', linestyle="dashed",
+        ax.plot(m_vals, sigma_mpp_vals, color='k', linestyle="dashed",
                 linewidth=2, label=r"$\left<\sigma\left[m''\right]\right>$")
-        ax.plot(test_ms, test_sigma_mp_means, markeredgecolor='b', linestyle='none', label=r"$\sigma\left[\hat{m}'\right]$",
-                marker=(3, 0, 0), markersize=s_markersize, markerfacecolor='None')
-        ax.plot(test_ms, test_sigma_mpp_means, markeredgecolor='b', linestyle='none', label=r"$\sigma\left[\hat{m}''\right]$",
-                marker=(4, 0, 45), markersize=s_markersize, markerfacecolor='None')
+
+        for test_m, sigma_mp, sigma_mpp in zip(test_ms, test_sigma_mp_means, test_sigma_mpp_means):
+
+            r_color = (test_m + 0.2) / 0.4
+            b_color = 1
+            color = (r_color, 1 - (r_color + b_color) / 2, b_color)
+
+            if test_m == 0.0:
+                mp_label = r"$\sigma\left[\hat{m}'\right]$"
+                mpp_label = r"$\sigma\left[\hat{m}''\right]$"
+            else:
+                mp_label = None
+                mpp_label = None
+
+            ax.plot(test_m, sigma_mp, markeredgecolor=color, linestyle='none', label=mp_label,
+                    marker=(3, 0, 0), markersize=s_markersize, markerfacecolor='None')
+            ax.plot(test_m, sigma_mpp, markeredgecolor=color, linestyle='none', label=mpp_label,
+                    marker=(4, 0, 45), markersize=s_markersize, markerfacecolor='None')
 
         # Draw the zero line
-        ax.plot(m_vals, np.zeros_like(m_vals), color='k', linestyle="solid")
+#         ax.plot(m_vals, np.zeros_like(m_vals), color='k', linestyle="solid")
 
-        ax.legend(loc="center left", numpoints=1)
+        ax.legend(loc="lower left", numpoints=1)
 
         # Save the plot
-        figname = ("both_" + calibration_set_size + "_proj_m_scatters." + file_format)
-        if file_format == "eps" or file_format == "pdf":
-            # Save in the paper location
-            figname = join(paper_location, figname)
-        pyplot.savefig(figname, format=file_format, bbox_inches="tight", pad_inches=0.05)
-
-        fig.show()
+#         figname = ("both_" + calibration_set_size + "_proj_m_scatters." + file_format)
+#         if file_format == "eps" or file_format == "pdf":
+#             # Save in the paper location
+#             figname = join(paper_location, figname)
+#         pyplot.savefig(figname, format=file_format, bbox_inches="tight", pad_inches=0.05)
+#
+#         fig.show()
 
     pyplot.show()
 

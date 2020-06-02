@@ -75,7 +75,7 @@ def main(argv):
         results_dir_2 = "calibration_results_" + calibration_set_size + "_2nd"
 
         # Load in the calculated results
-        test_ms = [-0.2, -0.1, -0.01, -0.005, 0., 0.005, 0.01, 0.1, 0.2]
+        test_ms = [-0.2, -0.1, -0.01, 0., 0.01, 0.1, 0.2]
         test_cs = [0.0]
 
         results = {}
@@ -142,11 +142,7 @@ def main(argv):
             for c in test_cs:
                 b_color = (0.1 + 0.1) / 0.2
 
-                # Only label the central point, and give it the color black instead
-                if m == 0 and c == 0:
-                    color = 'k'
-                else:
-                    color = (r_color, 1 - (r_color + b_color) / 2, b_color)
+                color = (r_color, 1 - (r_color + b_color) / 2, b_color)
 
                 res = results[(c, m)]
 

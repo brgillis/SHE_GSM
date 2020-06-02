@@ -48,7 +48,7 @@ markersize = 12
 pred_markersize = 64
 fontsize = 24
 ticksize = 16
-file_format = "pdf"
+file_format = "eps"
 paper_location = "/home/brg/Dropbox/gillis-comp-shared/Papers/Shear_Bias/"
 
 
@@ -148,7 +148,7 @@ def main(argv):
 
     fig.show()
 
-    # Plot distribution of m^?
+    # Plot distribution of m^c
 
     mq = np.zeros_like(m_hat)
     mq[np.abs(m_hat) < m_sigma] = m_hat[np.abs(m_hat) < m_sigma]
@@ -158,8 +158,8 @@ def main(argv):
     fig.subplots_adjust(wspace=0, hspace=0, bottom=0.1, right=0.95, top=0.95, left=0.12)
 
     ax = fig.add_subplot(1, 1, 1)
-    ax.set_xlabel(r"$m^?$", fontsize=fontsize)
-    ax.set_ylabel(r"$P(m^?)$", fontsize=fontsize)
+    ax.set_xlabel(r"$m^c$", fontsize=fontsize)
+    ax.set_ylabel(r"$P(m^c)$", fontsize=fontsize)
 
     ax.set_xlim(xlim[0], xlim[1])
     ax.set_ylim(ylim[0], ylim[1])
@@ -192,7 +192,7 @@ def main(argv):
     ax.fill_between(m_hat, pmq_r, 0, color=(1.0, 0.5, 0.5))
 
     # Label the plot
-    ax.text(0.06, 0.97, r"Post-conditional-calibration $m^?$", horizontalalignment='left',
+    ax.text(0.06, 0.97, r"Post-conditional-calibration $m^c$", horizontalalignment='left',
             verticalalignment='top', transform=ax.transAxes,
             fontsize=24)
 
